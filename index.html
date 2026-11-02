@@ -73,6 +73,10 @@ button{font-family:inherit}
 [data-dash-source-state=refreshing]{opacity:.5;transition:opacity var(--cds-dur-slow)}
 [data-dash-source-state=empty]{color:transparent}
 .apm-gantt{position:relative;min-height:22rem}
+.apm-pct{font-size:8.5px;font-weight:700;fill:var(--color-fg)}
+.apm-flagt{font-size:10.5px;font-weight:700}
+@media (prefers-reduced-motion:no-preference){.apm-pulse{animation:apm-pulse 1.8s ease-out infinite;transform-box:fill-box;transform-origin:center}@keyframes apm-pulse{from{transform:scale(1);opacity:.9}to{transform:scale(3.2);opacity:0}}}
+
 .apm-gsvg text{font-family:var(--font-anthropic-sans)}
 .apm-tick{font-size:11px;fill:var(--color-fg-muted)}
 .apm-glabel{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
@@ -123,7 +127,13 @@ button{font-family:inherit}
 .dg-chk input{accent-color:var(--c-pink);margin:0}
 .dg-chk i{width:1rem;height:3px;border-radius:2px;display:inline-block}
 .dg-grid{display:grid;gap:var(--cds-gap-md);grid-template-columns:minmax(0,1fr)}
-@media (min-width:1080px){.dg-grid{grid-template-columns:minmax(0,1fr) 19rem}}
+.dg-grid{position:relative}
+.dg-card{position:absolute;top:.5rem;right:.5rem;width:min(15rem,calc(100% - 1rem));max-height:calc(100% - 1rem);overflow:auto;background:var(--color-panel);border:1px solid var(--color-border-line);border-top:4px solid var(--c-pink);border-radius:var(--cds-radius);box-shadow:0 10px 30px rgba(0,0,0,.18);padding:.7rem .85rem;z-index:4;opacity:0;transform:translateY(-6px) scale(.98);pointer-events:none;transition:opacity .25s,transform .25s}
+.dg-card.show{opacity:1;transform:none;pointer-events:auto}
+.dg-card-h{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.2rem}
+.dg-card-h h3{margin:0!important;font-size:.72rem!important;text-transform:uppercase;letter-spacing:.06em;color:var(--c-pink)}
+.dg-close{border:0;background:transparent;color:var(--color-fg-muted);font-size:1.2rem;line-height:1;cursor:pointer;padding:0 .2rem}
+.dg-close:hover{color:var(--color-fg)}
 .dg-scroll{overflow-x:auto;position:relative}
 .dg-box{position:relative;min-width:760px;min-height:26rem}
 .dg{display:block}
@@ -158,11 +168,11 @@ button{font-family:inherit}
 }
 .dg-tip{position:absolute;pointer-events:none;background:var(--cds-surface-popover);border:1px solid var(--cds-border);border-radius:var(--cds-radius);box-shadow:var(--cds-shadow-popover);padding:var(--cds-pad-xs) var(--cds-pad-sm);font-size:var(--cds-font-size-caption);max-width:16rem;line-height:1.4;z-index:3}
 .dg-tip div:first-child{font-weight:600}
-.dd{font-size:var(--cds-font-size-caption);line-height:1.5}
-.dd h4{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--cds-font-size-heading);margin:0 0 .4rem}
-.dd .row{display:grid;grid-template-columns:6.5rem 1fr;gap:.4rem;padding:.3rem 0;border-bottom:1px dashed var(--color-border-line)}
-.dd .k{color:var(--color-fg-muted)}
-.dd ul{margin:.3rem 0 0;padding-left:1rem;max-height:13rem;overflow:auto}
+.dd{font-size:.74rem;line-height:1.45}.dg-card h3{font-size:.85rem!important}.dd-empty{font-size:.74rem!important}
+.dd h4{font-family:var(--font-anthropic-serif);font-weight:400;font-size:1rem;margin:0 0 .3rem}
+.dd .row{display:grid;grid-template-columns:1fr;gap:.05rem;padding:.25rem 0;border-bottom:1px dashed var(--color-border-line)}
+.dd .k{color:var(--color-fg-muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}
+.dd ul{margin:.2rem 0 0;padding-left:.9rem;max-height:10rem;overflow:auto}
 .dd li{margin:.15rem 0}
 .dd .sig{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;margin-right:.3rem;vertical-align:middle}
 .dd-empty{color:var(--color-fg-muted);font-size:var(--cds-font-size-caption);line-height:1.5;margin:0}
@@ -197,6 +207,7 @@ button{font-family:inherit}
         <span><i class="sw" style="background:var(--c-pink)"></i>Mitigasi: ICT &amp; AV</span>
         <span><i class="sw" style="background:var(--c-green)"></i>Mitigasi: ujian &amp; serah</span>
         <span><i class="sw" style="background:var(--c-teal)"></i>Mitigasi: renovasi</span>
+        <span><i class="sw" style="width:3px;height:.8rem;background:var(--c-red)"></i>Sepatutnya siap (mitigasi)</span>
         <span><i class="sw-line" style="border-color:var(--color-fg)"></i>Tarikh laporan</span>
         <span><i class="sw-line" style="border-color:var(--cds-chart-reference)"></i>Serah tapak asal</span>
         <span><i class="sw-line" style="border-color:var(--c-red)"></i>Serah tapak mitigasi</span>
@@ -263,7 +274,7 @@ button{font-family:inherit}
   <div class="apm-panel" data-tabpanel="diagram" id="diagram" hidden>
   <section>
     <h2>Diagram sistem AV</h2>
-    <p class="apm-lead">Diagram DK 1 &amp; 2 APM Rev 1.00 diwarnakan ikut semakan MA. Garisan bergerak menunjukkan arah isyarat. Kotak bergaris putus ialah item yang perlu ditambah dalam diagram, dan garisan bertitik ialah sambungan cadangan. Halakan tetikus untuk melihat sambungan, klik komponen untuk butiran.</p>
+    <p class="apm-lead">Diagram DK 1 &amp; 2 APM Rev 1.00 diwarnakan ikut semakan MA. Garisan bergerak menunjukkan arah isyarat. Kotak bergaris putus ialah item yang perlu ditambah dalam diagram, dan garisan bertitik ialah sambungan cadangan. Halakan tetikus untuk melihat sambungan, klik komponen untuk butiran (klik sekali lagi atau × untuk tutup).</p>
     <div class="apm-card">
       <div class="dg-ctl">
         <span class="lbl">Laluan isyarat:</span>
@@ -285,11 +296,10 @@ button{font-family:inherit}
       </div>
       <div class="dg-grid">
         <div class="dg-scroll"><div class="dg-box dash-skeleton" data-draw="diag" data-source="diagram_nod diagram_pautan"></div></div>
-        <div class="apm-card dg-card">
-          <h3>Butiran komponen</h3>
-          <p class="dd-empty">Klik mana-mana komponen dalam diagram untuk melihat status MA, model yang dikemukakan, isu dan sambungannya.</p>
+        <aside class="dg-card" aria-live="polite">
+          <div class="dg-card-h"><h3>Butiran komponen</h3><button class="dg-close" aria-label="Tutup butiran">×</button></div>
           <div class="dd" data-draw="diagdet" data-source="diagram_nod diagram_pautan peralatan"></div>
-        </div>
+        </aside>
       </div>
       <div class="apm-legend">
         <span><i class="sw" style="background:var(--d-ok)"></i>Sepadan</span>
@@ -351,30 +361,44 @@ button{font-family:inherit}
 
   dash.draw('had', (el) => { el.textContent = String(HAD); });
 
+  const gs = { drawn: false };
   dash.draw('gantt', (el) => {
     const j = dash.data('jadual'), k = dash.data('kontrak'); if (!ready(el, [j, k])) return;
     const kk = k.data[0];
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const animate = !gs.drawn && !reduce;
     const rows = j.data.map((r) => ({ ...r, a0: P(r.mula_asal), a1: d3.utcDay.offset(P(r.tamat_asal), 1), m0: P(r.mula_mit), m1: d3.utcDay.offset(P(r.tamat_mit), 1) }));
     const groups = [['ICT', 'Kerja ICT & AV', 'var(--c-pink)'], ['Ujian & serah', 'Ujian & serah tapak', 'var(--c-green)'], ['Renovasi', 'Renovasi yang menjadi prasyarat', 'var(--c-teal)']];
     const colOf = Object.fromEntries(groups.map((g) => [g[0], g[2]]));
-    const W = Math.max(300, el.clientWidth);
+    const W = Math.max(320, el.clientWidth);
     const x0 = P('2026-08-24'), x1 = P('2027-03-20');
-    const x = d3.scaleUtc([x0, x1], [4, W - 4]);
-    const RH = 38, GH = 24, top = 22;
+    const x = d3.scaleUtc([x0, x1], [6, W - 6]);
+    const RH = 40, GH = 30, top = 30;
     let y = top; const lay = [];
     groups.forEach(([g, label, c]) => {
       const rs = rows.filter((r) => r.kumpulan === g); if (!rs.length) return;
       lay.push({ g: label, c, y }); y += GH;
-      rs.forEach((r) => { lay.push({ r, y }); y += RH; });
+      rs.forEach((r, i) => { lay.push({ r, y, i }); y += RH; });
     });
-    const H = y + 6;
+    const H = y + 34;
     const svg = d3.create('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('class', 'apm-gsvg');
-    const months = d3.utcMonth.range(d3.utcMonth.ceil(x0), x1);
-    svg.append('g').selectAll('line').data(months).join('line')
-      .attr('x1', (d) => x(d)).attr('x2', (d) => x(d)).attr('y1', top - 4).attr('y2', H).attr('stroke', 'var(--cds-chart-grid)');
-    const step = (x(months[1]) - x(months[0])) < 44 ? 2 : 1;
-    svg.append('g').selectAll('text').data(months.filter((d, i) => i % step === 0 && x(d) + 40 < W)).join('text')
-      .attr('x', (d) => x(d) + 3).attr('y', 12).attr('class', 'apm-tick')
+    const defs = svg.append('defs');
+    groups.forEach(([g, , c], gi) => {
+      const lg = defs.append('linearGradient').attr('id', 'gg' + gi).attr('x1', 0).attr('x2', 1);
+      lg.append('stop').attr('offset', 0).style('stop-color', c).style('stop-opacity', 1);
+      lg.append('stop').attr('offset', 1).style('stop-color', 'var(--c-yellow)').style('stop-opacity', 1);
+    });
+    const gid = (g) => 'url(#gg' + groups.findIndex((x) => x[0] === g) + ')';
+    // pastel month bands
+    const months = d3.utcMonth.range(d3.utcMonth.floor(x0), x1);
+    const tints = ['var(--c-pink)', 'var(--c-yellow)', 'var(--c-teal)', 'var(--c-green)', 'var(--c-orange)', 'var(--c-purple)', 'var(--c-pink)', 'var(--c-yellow)'];
+    svg.append('g').selectAll('rect').data(months).join('rect')
+      .attr('x', (d) => Math.max(6, x(d))).attr('y', top - 8)
+      .attr('width', (d) => Math.max(0, Math.min(W - 6, x(d3.utcMonth.offset(d, 1))) - Math.max(6, x(d))))
+      .attr('height', H - top - 22).style('fill', (d, i) => tints[i % tints.length]).style('fill-opacity', 0.06);
+    const step = (x(months[2]) - x(months[1])) < 44 ? 2 : 1;
+    svg.append('g').selectAll('text').data(months.filter((d, i) => i % step === 0 && x(d) >= 6 && x(d) + 40 < W)).join('text')
+      .attr('x', (d) => x(d) + 4).attr('y', 14).attr('class', 'apm-tick')
       .text((d) => MON[d.getUTCMonth()] + (d.getUTCMonth() === 0 ? ' ' + String(d.getUTCFullYear()).slice(2) : ''));
     const tip = div('apm-tip'); tip.hidden = true;
     const show = (ev, r) => {
@@ -384,30 +408,60 @@ button{font-family:inherit}
       tip.hidden = false;
       const b = el.getBoundingClientRect();
       const px = ev.clientX - b.left, py = ev.clientY - b.top;
-      const tw = tip.offsetWidth, th = tip.offsetHeight;
-      tip.style.left = Math.max(0, Math.min(px + 12, b.width - tw)) + 'px';
-      tip.style.top = (py + 14 + th > b.height ? py - th - 10 : py + 14) + 'px';
+      tip.style.left = Math.max(0, Math.min(px + 12, b.width - tip.offsetWidth)) + 'px';
+      tip.style.top = (py + 14 + tip.offsetHeight > b.height ? py - tip.offsetHeight - 10 : py + 14) + 'px';
     };
     const rep = P(kk.tarikh_laporan);
+    let n = 0;
     lay.forEach((it) => {
-      if (it.g) { svg.append('text').attr('x', 4).attr('y', it.y + 15).attr('class', 'apm-glabel').attr('fill', it.c).text(it.g); return; }
+      if (it.g) {
+        const gg = svg.append('g').attr('transform', `translate(6,${it.y + 4})`);
+        const t = gg.append('text').attr('x', 10).attr('y', 15).attr('class', 'apm-glabel').style('fill', '#fff').text(it.g);
+        gg.insert('rect', 'text').attr('width', it.g.length * 7.6 + 22).attr('height', 21).attr('rx', 10.5).style('fill', it.c);
+        return;
+      }
       const r = it.r, col = colOf[r.kumpulan];
       const g = svg.append('g').attr('class', 'apm-row').attr('transform', `translate(0,${it.y})`);
-      g.append('text').attr('x', 4).attr('y', 11).attr('class', 'apm-rlabel').text((r.kumpulan === 'Renovasi' ? '' : r.id + ' · ') + r.ringkas);
-      g.append('rect').attr('x', x(r.a0)).attr('y', 16).attr('width', Math.max(3, x(r.a1) - x(r.a0))).attr('height', 5).attr('rx', 2).attr('fill', 'var(--cds-chart-muted)');
-      const mw = Math.max(4, x(r.m1) - x(r.m0));
-      g.append('rect').attr('x', x(r.m0)).attr('y', 23).attr('width', mw).attr('height', 10).attr('rx', 3).attr('fill', col).attr('opacity', 0.35);
-      if (r.siap > 0) g.append('rect').attr('x', x(r.m0)).attr('y', 23).attr('width', Math.max(2, mw * r.siap / 100)).attr('height', 10).attr('rx', 3).attr('fill', col);
-      if (P(r.tamat_mit) < rep && r.siap < 100) {
-        g.append('text').attr('class', 'apm-late').attr('y', 32).attr('x', Math.min(x(r.m1) + 6, W - 110)).text('Lewat · ' + r.siap + '% siap');
+      if (it.i % 2 === 0) g.append('rect').attr('x', 0).attr('y', -2).attr('width', W).attr('height', RH - 2).attr('rx', 8).style('fill', col).style('fill-opacity', 0.05);
+      g.append('text').attr('x', 10).attr('y', 12).attr('class', 'apm-rlabel').text((r.kumpulan === 'Renovasi' ? '' : r.id + ' · ') + r.ringkas);
+      g.append('rect').attr('x', x(r.a0)).attr('y', 17).attr('width', Math.max(3, x(r.a1) - x(r.a0))).attr('height', 4).attr('rx', 2).attr('fill', 'var(--cds-chart-muted)');
+      const mx = x(r.m0), mw = Math.max(8, x(r.m1) - x(r.m0));
+      const track = g.append('rect').attr('x', mx).attr('y', 23).attr('height', 12).attr('rx', 6).style('fill', col).style('fill-opacity', 0.22).style('stroke', col).style('stroke-opacity', 0.5);
+      const fillW = r.siap > 0 ? Math.max(6, mw * r.siap / 100) : 0;
+      const fill = g.append('rect').attr('x', mx).attr('y', 23).attr('height', 12).attr('rx', 6).attr('fill', gid(r.kumpulan));
+      if (r.jadual_pct > r.siap) {
+        const tx = mx + mw * r.jadual_pct / 100;
+        g.append('line').attr('x1', tx).attr('x2', tx).attr('y1', 20).attr('y2', 38).style('stroke', 'var(--c-red)').attr('stroke-width', 2).attr('stroke-linecap', 'round');
       }
+      const pctX = mx + mw + 6;
+      const pill = g.append('g').attr('transform', `translate(${Math.min(pctX, W - 40)},23)`);
+      pill.append('rect').attr('width', 34).attr('height', 12).attr('rx', 6).style('fill', r.siap >= 100 ? 'var(--c-green)' : r.siap > 0 ? 'var(--c-yellow)' : 'var(--color-panel)').style('stroke', col);
+      const pt = pill.append('text').attr('x', 17).attr('y', 9.3).attr('text-anchor', 'middle').attr('class', 'apm-pct').text('0%');
+      const late = P(r.tamat_mit) < rep && r.siap < 100;
+      if (late) g.append('text').attr('class', 'apm-late').attr('y', 12).attr('x', Math.min(Math.max(x(r.m1) + 46, 180), W - 90)).text('Lewat');
       g.append('rect').attr('x', 0).attr('y', 0).attr('width', W).attr('height', RH - 2).attr('fill', 'transparent')
         .on('pointermove', (ev) => show(ev, r)).on('pointerleave', () => { tip.hidden = true; });
+      if (animate) {
+        const delay = 120 + n * 55;
+        track.attr('width', 0).transition().delay(delay).duration(650).ease(d3.easeCubicOut).attr('width', mw);
+        fill.attr('width', 0).transition().delay(delay + 450).duration(900).ease(d3.easeCubicOut).attr('width', fillW);
+        pt.transition().delay(delay + 450).duration(900).tween('text', () => { const ip = d3.interpolateRound(0, r.siap); return (t) => { pt.text(ip(t) + '%'); }; });
+        pill.style('opacity', 0).transition().delay(delay + 300).duration(400).style('opacity', 1);
+      } else { track.attr('width', mw); fill.attr('width', fillW); pt.text(r.siap + '%'); }
+      n++;
     });
-    [[kk.tarikh_laporan, 'var(--color-fg)', null], [kk.siap_asal, 'var(--cds-chart-reference)', '4 3'], [kk.siap_mitigasi, 'var(--c-red)', '4 3']].forEach(([d, c, da]) => {
-      svg.append('line').attr('x1', x(P(d))).attr('x2', x(P(d))).attr('y1', top - 4).attr('y2', H)
-        .attr('stroke', c).attr('stroke-width', 1.5).attr('stroke-dasharray', da).attr('pointer-events', 'none');
+    // reference lines + flags at bottom
+    const fy = H - 20;
+    [[kk.tarikh_laporan, 'var(--color-fg)', null, 'Laporan ' + fmtS(rep)], [kk.siap_asal, 'var(--cds-chart-reference)', '4 3', 'Serah asal ' + fmtS(P(kk.siap_asal))], [kk.siap_mitigasi, 'var(--c-red)', '4 3', 'Serah mitigasi ' + fmtS(P(kk.siap_mitigasi))]].forEach(([d, c, da, lbl], i) => {
+      const xx = x(P(d));
+      svg.append('line').attr('x1', xx).attr('x2', xx).attr('y1', top - 8).attr('y2', fy).style('stroke', c).attr('stroke-width', 1.5).attr('stroke-dasharray', da).attr('pointer-events', 'none');
+      const fl = svg.append('g').attr('transform', `translate(${xx},${fy})`).attr('class', 'apm-flag' + (i === 0 ? ' now' : ''));
+      fl.append('circle').attr('r', 4.5).style('fill', c);
+      if (i === 0) fl.append('circle').attr('class', 'apm-pulse').attr('r', 4.5).style('fill', 'none').style('stroke', c).attr('stroke-width', 2);
+      const t = fl.append('text').attr('y', 16).attr('class', 'apm-flagt').style('fill', c).text(lbl);
+      t.attr('text-anchor', i === 0 ? 'middle' : i === 1 ? 'end' : 'start').attr('x', i === 1 ? -6 : i === 2 ? 6 : 0);
     });
+    gs.drawn = true;
     el.replaceChildren(svg.node(), tip);
   });
 
@@ -462,6 +516,7 @@ button{font-family:inherit}
     const p = b.dataset.path.split(',');
     ds.path = ds.path && ds.path.join(',') === b.dataset.path ? null : p; setPathBtns(); dash.draw('diag');
   }));
+  document.querySelectorAll('.dg-close').forEach((b) => b.addEventListener('click', () => { ds.sel = null; dash.draw('diag'); dash.draw('diagdet'); }));
   document.querySelectorAll('.dg-clear').forEach((b) => b.addEventListener('click', () => { ds.path = null; ds.sel = null; setPathBtns(); dash.draw('diag'); dash.draw('diagdet'); }));
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -538,8 +593,8 @@ button{font-family:inherit}
     const restore = () => { const pf = pathFocus(); pf ? focus(pf[0], pf[1]) : focus(null, new Set()); };
     n.data.forEach((d, i) => {
       const st = STC[d.status] || STC['Tiada MA'];
-      const g = gN.append('g').attr('class', 'nd ' + st[1] + (d.id === 'matrix' ? ' big' : '') + (d.id === ds.sel ? ' sel' : '') + (ds.drawn ? '' : ' in'))
-        .attr('transform', `translate(${d.x - d.w / 2},${d.y - d.h / 2})`).attr('tabindex', 0).attr('role', 'button')
+      const g = gN.append('g').attr('transform', `translate(${d.x - d.w / 2},${d.y - d.h / 2})`).append('g').attr('class', 'nd ' + st[1] + (d.id === 'matrix' ? ' big' : '') + (d.id === ds.sel ? ' sel' : '') + (ds.drawn ? '' : ' in'))
+        .attr('tabindex', 0).attr('role', 'button')
         .attr('aria-label', d.label.replace(/\n/g, ' ') + ', ' + d.status);
       if (!ds.drawn) g.style('animation-delay', (i * 22) + 'ms');
       g.append('rect').attr('class', 'bx').attr('width', d.w).attr('height', d.h).attr('rx', d.id === 'matrix' ? 14 : 6)
@@ -578,7 +633,7 @@ button{font-family:inherit}
   dash.draw('diagdet', (el) => {
     const n = dash.data('diagram_nod'), l = dash.data('diagram_pautan'), p = dash.data('peralatan');
     const d = ds.sel && n.status === 'ok' ? n.data.find((x) => x.id === ds.sel) : null;
-    document.querySelectorAll('.dd-empty').forEach((e) => { e.hidden = !!d; });
+    document.querySelectorAll('.dg-card').forEach((e) => e.classList.toggle('show', !!d));
     if (!d || l.status !== 'ok' || p.status !== 'ok') { el.replaceChildren(); return; }
     const st = STC[d.status] || STC['Tiada MA'];
     const out = [];
