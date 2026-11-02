@@ -89,6 +89,12 @@ button{font-family:inherit}
 .apm-kdate{font-size:10px;font-weight:600;fill:var(--c-pink)}
 .apm-badge{font-size:8.5px;font-weight:700;fill:#fff}
 .ps{display:inline-block;padding:.12rem .5rem;border-radius:999px;font-size:.72rem;font-weight:600;white-space:nowrap;border:1.5px solid}
+.apm-h2row{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-bottom:var(--cds-gap-xs)}
+.apm-h2row h2{margin:0}
+.apm-pdf{display:inline-flex;align-items:center;gap:.4rem;font:inherit;font-size:var(--cds-font-size-caption);font-weight:700;color:#fff;background:linear-gradient(115deg,#E0457B,#F57C20);border:0;border-radius:999px;padding:.5rem 1rem;cursor:pointer;box-shadow:0 3px 10px rgba(224,69,123,.3);transition:transform .15s,box-shadow .15s}
+.apm-pdf:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(224,69,123,.4)}
+.apm-pdf:disabled{opacity:.6;cursor:progress}
+.apm-pdf.busy svg{animation:pdfb .8s ease-in-out infinite alternate}@keyframes pdfb{to{transform:translateY(3px)}}
 .apm-pct{font-size:8.5px;font-weight:700;fill:var(--color-fg)}
 .apm-flagt{font-size:10.5px;font-weight:700}
 @media (prefers-reduced-motion:no-preference){.apm-pulse{animation:apm-pulse 1.8s ease-out infinite;transform-box:fill-box;transform-origin:center}@keyframes apm-pulse{from{transform:scale(1);opacity:.9}to{transform:scale(3.2);opacity:0}}}
@@ -214,7 +220,7 @@ button{font-family:inherit}
 
   <div class="apm-panel" data-tabpanel="pemasangan" id="pemasangan">
   <section id="jadual">
-    <h2>Jadual pemasangan ICT &amp; AV</h2>
+    <div class="apm-h2row"><h2>Jadual pemasangan ICT &amp; AV</h2><button class="apm-pdf" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Muat turun PDF</button></div>
     <p class="apm-lead">Setiap peralatan dalam Senarai perincian dipaparkan sebagai satu baris, dikumpul ikut kerja pemasangan dalam pelan mitigasi kontraktor. Kemajuan setiap item dikira dari empat tahap: MA lulus, barang tiba, dipasang dan diuji (25% setiap tahap). Kawasan merah jambu bergaris putus ialah tempoh kerja pemasangan itu. Halakan tetikus pada baris untuk butiran.</p>
     <div class="stg-grid">
       <div class="stg-card" style="--sc:var(--c-green)"><p class="stg-l">MA lulus</p><p class="stg-n"><b data-draw="stg" data-tahap="MA lulus" data-source="kemajuan_pasang" data-field="n" data-where="tahap=MA lulus">—</b> <small>/ <span data-draw="stgj" data-source="kemajuan_pasang" data-field="jumlah" data-where="tahap=MA lulus">—</span> item</small></p><div class="stg-track" data-draw="stgbar" data-tahap="MA lulus"></div></div>
@@ -586,6 +592,73 @@ button{font-family:inherit}
       return tr;
     }));
   });
+  // ---- PDF timeline ----
+  const inlineStyles = (src, dst) => {
+    const props = ['fill', 'fill-opacity', 'stroke', 'stroke-opacity', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'opacity', 'font-size', 'font-weight', 'font-family', 'text-anchor'];
+    const s = [src, ...src.querySelectorAll('*')], d = [dst, ...dst.querySelectorAll('*')];
+    s.forEach((e, i) => {
+      const cs = getComputedStyle(e), t = d[i]; if (!t || !t.style) return;
+      props.forEach((p) => { let v = cs.getPropertyValue(p); if (v && v.indexOf('url(') === 0) { const m = v.match(/#([^"')]+)/); v = m ? 'url(#' + m[1] + ')' : v; } if (v) t.style.setProperty(p, v); });
+      t.style.removeProperty('animation'); t.style.setProperty('transition', 'none');
+      if (e.tagName.toLowerCase() === 'stop') { t.style.setProperty('stop-color', cs.getPropertyValue('stop-color')); t.style.setProperty('stop-opacity', cs.getPropertyValue('stop-opacity')); }
+    });
+  };
+  const makePdf = (jpeg, iw, ih) => {
+    const bin = atob(jpeg.split(',')[1]); const img = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) img[i] = bin.charCodeAt(i);
+    const pw = 842, ph = Math.round(pw * ih / iw);
+    const enc = new TextEncoder(), parts = [], off = []; let len = 0;
+    const push = (x) => { const u = typeof x === 'string' ? enc.encode(x) : x; parts.push(u); len += u.length; };
+    const obj = (n, body) => { off[n] = len; push(n + ' 0 obj\n' + body + '\nendobj\n'); };
+    push('%PDF-1.4\n');
+    obj(1, '<</Type/Catalog/Pages 2 0 R>>');
+    obj(2, '<</Type/Pages/Kids[3 0 R]/Count 1>>');
+    obj(3, `<</Type/Page/Parent 2 0 R/MediaBox[0 0 ${pw} ${ph}]/Resources<</XObject<</Im0 4 0 R>>>>/Contents 5 0 R>>`);
+    off[4] = len; push(`4 0 obj\n<</Type/XObject/Subtype/Image/Width ${iw}/Height ${ih}/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length ${img.length}>>\nstream\n`); push(img); push('\nendstream\nendobj\n');
+    const c = `q ${pw} 0 0 ${ph} 0 0 cm /Im0 Do Q`;
+    obj(5, `<</Length ${c.length}>>\nstream\n${c}\nendstream`);
+    const xo = len;
+    push('xref\n0 6\n0000000000 65535 f \n' + [1, 2, 3, 4, 5].map((n) => String(off[n]).padStart(10, '0') + ' 00000 n \n').join(''));
+    push(`trailer\n<</Size 6/Root 1 0 R>>\nstartxref\n${xo}\n%%EOF`);
+    return new Blob(parts, { type: 'application/pdf' });
+  };
+  const timelinePdf = async (btn) => {
+    const svg = document.querySelector('.apm-gantt svg'); if (!svg) return;
+    btn.disabled = true; btn.classList.add('busy');
+    try {
+      const vb = svg.viewBox.baseVal, W = vb.width, Hs = vb.height;
+      const clone = svg.cloneNode(true); inlineStyles(svg, clone);
+      clone.querySelectorAll('.apm-pulse').forEach((e) => e.remove());
+      clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg'); clone.setAttribute('width', W); clone.setAttribute('height', Hs);
+      const im = new Image(); im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
+      await im.decode();
+      const S = 2, HEAD = 96, PAD = 24;
+      const cv = document.createElement('canvas'); cv.width = (W + PAD * 2) * S; cv.height = (Hs + HEAD + PAD) * S;
+      const ctx = cv.getContext('2d'); ctx.scale(S, S);
+      const css = getComputedStyle(document.querySelector('.apm'));
+      const panel = getComputedStyle(document.querySelector('.apm-card')).backgroundColor || '#fff';
+      ctx.fillStyle = panel; ctx.fillRect(0, 0, W + PAD * 2, Hs + HEAD + PAD);
+      const grd = ctx.createLinearGradient(0, 0, W + PAD * 2, 0);
+      grd.addColorStop(0, '#C2185B'); grd.addColorStop(0.4, '#E0457B'); grd.addColorStop(0.75, '#F57C20'); grd.addColorStop(1, '#F4B400');
+      ctx.fillStyle = grd; ctx.fillRect(0, 0, W + PAD * 2, 62);
+      ctx.fillStyle = '#fff'; ctx.font = '600 11px sans-serif'; ctx.fillText('PEMANTAUAN PEMASANGAN ICT & AV · AKADEMI PENGAJIAN MELAYU', PAD, 22);
+      ctx.font = '22px Georgia, serif'; ctx.fillText('Jadual pemasangan ICT & AV · DK Anggerik & DK Tanjung', PAD, 48);
+      const kp = dash.data('kemajuan_pasang'), kt = dash.data('kontrak');
+      const now = new Date();
+      let line = 'Dijana ' + now.getDate() + ' ' + MON[now.getMonth()] + ' ' + now.getFullYear();
+      if (kt.status === 'ok') line += ' · Data jadual: Laporan Kemajuan No. 3 (' + fmt(P(kt.data[0].tarikh_laporan)) + ')';
+      if (kp.status === 'ok') line += ' · ' + kp.data.map((r) => r.tahap + ' ' + r.n + '/' + r.jumlah).join(' · ');
+      ctx.fillStyle = css.getPropertyValue('--color-fg') || '#222'; ctx.font = '12px sans-serif'; ctx.fillText(line, PAD, 84);
+      ctx.drawImage(im, PAD, HEAD, W, Hs);
+      const blob = makePdf(cv.toDataURL('image/jpeg', 0.92), cv.width, cv.height);
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'Jadual_Pemasangan_ICT_DK_APM_' + now.toISOString().slice(0, 10) + '.pdf';
+      a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    } catch (err) { console.error(err); }
+    btn.disabled = false; btn.classList.remove('busy');
+  };
+  document.querySelectorAll('.apm-pdf').forEach((b) => b.addEventListener('click', () => timelinePdf(b)));
+
   // ---- tab ----
   const showTab = (t) => {
     document.querySelectorAll('[data-tabpanel]').forEach((p) => { p.hidden = p.dataset.tabpanel !== t; });
